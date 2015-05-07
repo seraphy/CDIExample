@@ -7,6 +7,7 @@ import javax.annotation.PreDestroy;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
+import javax.inject.Named;
 import org.apache.deltaspike.core.api.exception.control.event.ExceptionToCatchEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +17,7 @@ import org.slf4j.LoggerFactory;
  * @author seraphy
  */
 @ApplicationScoped
+@Named("echoServer")
 public class EchoServerImpl implements EchoServer, Serializable {
 
     /**

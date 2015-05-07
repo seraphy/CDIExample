@@ -1,12 +1,16 @@
 package jp.seraphyware.cdiexample;
 
+import javax.el.ELProcessor;
+import javax.el.ELResolver;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Instance;
+import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 import org.apache.deltaspike.cdise.api.CdiContainer;
 import org.apache.deltaspike.cdise.api.CdiContainerLoader;
 import org.apache.deltaspike.cdise.api.ContextControl;
+import org.apache.deltaspike.core.api.provider.BeanManagerProvider;
 import org.apache.deltaspike.core.api.provider.BeanProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,6 +74,15 @@ public class MainApp {
             logger.info("instance<T>.destroy :" + bean1);
             simpleBean.destroy(bean1);
         }
+        
+        // EL式のテスト
+        ELProcessor elProc = new ELProcessor();
+        BeanManager bm = BeanManagerProvider.getInstance().getBeanManager();
+        ELResolver elResolver = bm.getELResolver();
+        elProc.getELManager().addELResolver(elResolver);
+
+        Object ret = elProc.eval("echoServer.say('●◎●◎ EL式からの呼び出し ●◎●◎')");
+        logger.info("el ret=" + ret);
     }
 
     /**
