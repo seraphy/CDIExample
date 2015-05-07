@@ -1,12 +1,15 @@
 package jp.seraphyware.cdiexample;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Instance;
 import javax.inject.Inject;
 import org.apache.deltaspike.cdise.api.CdiContainer;
 import org.apache.deltaspike.cdise.api.CdiContainerLoader;
 import org.apache.deltaspike.cdise.api.ContextControl;
 import org.apache.deltaspike.core.api.provider.BeanProvider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * [Apache DeltaSpike + WeldSEの設定]
@@ -20,6 +23,8 @@ import org.apache.deltaspike.core.api.provider.BeanProvider;
  */
 @ApplicationScoped
 public class MainApp {
+    
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     /**
      * エコーサービス
@@ -28,30 +33,53 @@ public class MainApp {
     private EchoServer echoServer;
     
     /**
-     * 都度インスタンス作成する間接参照
+     * インジェクションへの間接参照
      */
     @Inject
     Instance<SimpleBean> simpleBean;
     
+    /**
+     * テスト
+     */
     public void run() {
         // シングルトン(ApplicationScoped)のサービス呼び出し
         echoServer.say("hello, " + getClass());
 
+        // 例外イベントのテスト
+        echoServer.say(null);
+        
         // Instance<T>によるインジェクションへの間接参照
         SimpleBean bean1 = simpleBean.get();
-        System.out.println("bean1=" + bean1);
-
-        // Instance<T>によるインジェクションへの間接参照 #2
-        // @Dependentなので呼び出すたびにインスタンスが新しい.
-        SimpleBean bean2 = simpleBean.get();
-        System.out.println("bean2=" + bean2);
-        
-        // Instanceで取得した@Dependentのインスタンスは明示的に破棄する必要がある
-        System.out.println("instance<T>.destroy");
-        simpleBean.destroy(bean1);
-        simpleBean.destroy(bean2);
+        try {
+            logger.info("bean1=" + bean1);
+            
+            // Instance<T>によるインジェクションへの間接参照 #2
+            // @Dependentなので呼び出すたびにインスタンスが新しい.
+            SimpleBean bean2 = simpleBean.get();
+            try {
+                logger.info("bean2=" + bean2);
+                
+            } finally {
+                // Instanceで取得した@Dependentのインスタンスは明示的に破棄する必要がある
+                logger.info("instance<T>.destroy :" + bean2);
+                simpleBean.destroy(bean2);
+            }
+            
+        } finally {
+            // Instanceで取得した@Dependentのインスタンスは明示的に破棄する必要がある
+            logger.info("instance<T>.destroy :" + bean1);
+            simpleBean.destroy(bean1);
+        }
     }
 
+    /**
+     * 何らかのイベントをキャッチして表示する.
+     * @param event 
+     */
+    public void hanleAnyEvent(@Observes Object event) {
+        logger.info("● " + event);
+    }
+    
     /**
      * エントリポイント
      * @param args 
@@ -74,6 +102,13 @@ public class MainApp {
         // 明示的にDIコンテナからインスタンスを取得する.
         MainApp app = BeanProvider.getContextualReference(MainApp.class, false);
         app.run();
+        
+        // しばらく待つ
+        try {
+            Thread.sleep(5 * 1000);
+        } catch (InterruptedException ex) {
+            ex.printStackTrace(System.err);
+        }
         
         // コンテキストの無効化
         System.out.println("☆コンテキストを終了します。");
