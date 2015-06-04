@@ -35,7 +35,8 @@ public class EchoServerImpl implements EchoServer, Serializable {
     /**
      * ロガー
      */
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    @Inject
+    private Logger logger;
 
     @PostConstruct
     protected void initialize() {

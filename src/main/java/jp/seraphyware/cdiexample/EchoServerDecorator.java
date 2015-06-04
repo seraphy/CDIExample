@@ -4,7 +4,6 @@ import javax.decorator.Decorator;
 import javax.decorator.Delegate;
 import javax.inject.Inject;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * EchoServerに対するデコレータ.<br>
@@ -14,7 +13,8 @@ import org.slf4j.LoggerFactory;
 @Decorator
 public class EchoServerDecorator implements EchoServer {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    @Inject
+    private Logger logger;
     
     @Inject
     @Delegate

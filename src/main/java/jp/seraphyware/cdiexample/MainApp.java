@@ -13,7 +13,6 @@ import org.apache.deltaspike.cdise.api.ContextControl;
 import org.apache.deltaspike.core.api.provider.BeanManagerProvider;
 import org.apache.deltaspike.core.api.provider.BeanProvider;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * [Apache DeltaSpike + WeldSEの設定]
@@ -28,7 +27,11 @@ import org.slf4j.LoggerFactory;
 @ApplicationScoped
 public class MainApp {
     
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    /**
+     * ロガー
+     */
+    @Inject
+    private Logger logger;
 
     /**
      * エコーサービス
@@ -89,7 +92,7 @@ public class MainApp {
      * 何らかのイベントをキャッチして表示する.
      * @param event 
      */
-    public void hanleAnyEvent(@Observes Object event) {
+    public void hanleAnyEvent(@Observes MyEvent event) {
         logger.info("● " + event);
     }
     
