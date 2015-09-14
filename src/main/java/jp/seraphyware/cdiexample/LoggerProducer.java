@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 /**
  * ロガーを構築するプロデューサ
  */
-@ApplicationScoped
+@Dependent
 public class LoggerProducer {
     
     private final Logger logger = LoggerFactory.getLogger(getClass());
