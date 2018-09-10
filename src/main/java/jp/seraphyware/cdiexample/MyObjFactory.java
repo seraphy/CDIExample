@@ -10,26 +10,27 @@ import javax.enterprise.context.Dependent;
 import javax.enterprise.inject.Disposes;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
+
 import org.slf4j.Logger;
 
 @ApplicationScoped
 public class MyObjFactory {
-    
+
     @Inject
     private Logger logger;
-    
+
     @Produces
     @Dependent
     public MyObj createMyObj() {
         MyObj inst = new MyObj(self -> {
             logger.info("@@disposed: " + self);
         });
-        logger.info("@@createMyObj: " + inst);
+        logger.info("★☆createMyObj: " + inst);
         return inst;
     }
 
     public void destroy(@Disposes MyObj obj) {
-        logger.info("@@disposes: " + obj);
+        logger.info("☆★disposes: " + obj);
         obj.close();
     }
 }

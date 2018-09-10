@@ -3,13 +3,16 @@ package jp.seraphyware.cdiexample;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
 import javax.el.ELProcessor;
 import javax.el.ELResolver;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.spi.BeanManager;
+import javax.enterprise.inject.spi.CDI;
 import javax.inject.Inject;
+
 import org.apache.deltaspike.cdise.api.CdiContainer;
 import org.apache.deltaspike.cdise.api.CdiContainerLoader;
 import org.apache.deltaspike.cdise.api.ContextControl;
@@ -47,12 +50,6 @@ public class MainApp {
      */
     @Inject
     Instance<SimpleBean> simpleBeanHolder;
-
-    /**
-     *
-     */
-    @Inject
-    Instance<MyObj> myObjHolder;
 
     /**
      * テスト
@@ -96,6 +93,8 @@ public class MainApp {
         Object ret = elProc.eval("echoServer.say('●◎●◎ EL式からの呼び出し ●◎●◎')");
         logger.info("el ret=" + ret);
 
+        // CDIの直接参照
+        Instance<MyObj> myObjHolder = CDI.current().select(MyObj.class);
         List<MyObj> myObjs = IntStream.range(0, 5)
                 .mapToObj(idx -> myObjHolder.get())
                 .collect(Collectors.toList());
